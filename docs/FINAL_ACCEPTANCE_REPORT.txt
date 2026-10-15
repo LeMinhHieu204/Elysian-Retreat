@@ -1,0 +1,79 @@
+# ELYSIAN RETREAT — FINAL LOCAL ACCEPTANCE REPORT
+
+Ngày kiểm thử: 2026-10-15  
+Base URL: `http://127.0.0.1:4174`  
+Database: PostgreSQL disposable QA database trên `127.0.0.1:55432`; không dùng production data.
+
+## Kết luận
+
+**PASS cho các luồng booking, customer, service request và admin đã triển khai; PARTIAL cho CMS editor.** Browser QA đã thực sự chạy bằng Google Chrome điều khiển bởi Playwright, không dùng mockup và không dùng Tabbit CLI.
+
+Giới hạn còn lại không chặn các luồng đặt phòng cốt lõi: chưa có CMS editor route riêng và Google Fonts bị môi trường QA chặn request ngoài. Chi tiết nằm ở cuối báo cáo.
+
+## Môi trường browser
+
+| Hạng mục | Kết quả |
+|---|---|
+| Browser | Google Chrome 155.0.8059.41 |
+| Playwright | 1.64.1 |
+| Executable | `C:\Program Files\Google\Chrome\Application\chrome.exe` |
+| Viewports | 1440×1000, 768×1000, 390×844 |
+| Route diagnostics | 27 checks (9 routes × 3 viewports) |
+| Screenshots | Playwright `page.screenshot({ fullPage: true })` |
+
+## Acceptance matrix
+
+| Khu vực / luồng | Trạng thái | Bằng chứng |
+|---|---|---|
+| Homepage | PASS | [desktop](acceptance/screenshots/home-desktop.png), [tablet](acceptance/screenshots/home-tablet.png), [mobile](acceptance/screenshots/home-mobile.png) |
+| Rooms listing và filter layout | PASS | [desktop](acceptance/screenshots/rooms-desktop.png), [tablet](acceptance/screenshots/rooms-tablet.png), [mobile](acceptance/screenshots/rooms-mobile.png) |
+| Room detail / gallery | PASS | [desktop](acceptance/screenshots/room-detail-desktop.png), [tablet](acceptance/screenshots/room-detail-tablet.png), [mobile](acceptance/screenshots/room-detail-mobile.png) |
+| Booking page | PASS | [desktop](acceptance/screenshots/booking-desktop.png), [tablet](acceptance/screenshots/booking-tablet.png), [mobile](acceptance/screenshots/booking-mobile.png) |
+| Register, login và account | PASS | [account profile](acceptance/screenshots/account-profile-desktop.png), [confirmation](acceptance/screenshots/account-confirmation-desktop.png) |
+| Booking persistence | PASS | Browser tạo reference `ELY-2026-KLKZA8` và xác nhận lại qua `/api/account/bookings` |
+| Profile persistence | PASS | Browser PATCH profile rồi GET lại `display_name` từ API |
+| Spa, Dining, Experiences | PASS | Form submit thành công; admin queue xác nhận dữ liệu persistence |
+| Admin login/dashboard | PASS | [admin dashboard](acceptance/screenshots/admin-dashboard-desktop.png) |
+| Admin metrics/catalog/service queues | PASS | Dashboard metrics, 8 room types, service request queues đều đọc được từ PostgreSQL |
+| CMS/public content | PARTIAL | [content desktop](acceptance/screenshots/cms-about-desktop.png), [tablet](acceptance/screenshots/cms-about-tablet.png), [mobile](acceptance/screenshots/cms-about-mobile.png). Public content và inquiries surface có sẵn; chưa có CMS editor UI route riêng. |
+
+## Browser diagnostics
+
+| Kiểm tra | Kết quả |
+|---|---:|
+| Horizontal overflow | PASS — 0/27 |
+| Critical controls bị che | PASS — 0/27 |
+| Broken images | PASS — 0 |
+| Local failed requests | PASS — 0 |
+| Local HTTP responses ≥ 400 | PASS — 0 |
+| Application page errors | PASS — 0 |
+| Application console errors | PASS — 0 |
+| External warnings | 3 Google Fonts requests bị `net::ERR_NETWORK_ACCESS_DENIED` trong sandbox |
+
+External font warning không làm hỏng route hoặc layout; browser vẫn render bằng fallback font. Khi chạy trong môi trường có internet, Google Fonts sẽ được tải từ `fonts.googleapis.com`.
+
+## Database-backed workflows
+
+- Customer account được tạo bằng browser với email test duy nhất.
+- Profile được sửa trong Account và đọc lại từ database qua API.
+- Reservation được submit từ Booking page, sinh confirmation reference và đọc lại trong Account.
+- Spa, Dining và Experiences được submit bằng form browser; admin service queues xác nhận từng record theo email test.
+- Admin login bằng disposable QA admin; dashboard, room inventory, reports và service queues đều load được.
+- Database đã được reset/seed lại trước lượt browser evidence cuối cùng.
+
+## Test commands
+
+| Command | Kết quả |
+|---|---|
+| `npm.cmd test` | PASS — 6/6 tests |
+| `node tests/api-smoke.mjs` | PASS — health connected, 8 rooms, 1 booking success / 3 concurrency conflicts, admin true |
+| `npm.cmd run test:browser` | PASS — Chrome thật, 27 diagnostics, customer PASS, admin PASS, blocked 0 |
+
+Raw browser result: [browser-qa-results.json](acceptance/browser-qa-results.json)
+
+## Giới hạn còn lại
+
+1. CMS chưa có editor route/UI riêng để tạo hoặc chỉnh sửa content trong browser; acceptance hiện chỉ xác nhận public content và backend inquiries/content surface.
+2. Google Fonts là dependency ngoài bị sandbox chặn trong QA; đây là environment warning, không phải local application failure.
+3. Stripe live checkout, email delivery và production deployment chưa được thực hiện; booking dùng pay-at-property/demo path trong môi trường local.
+4. Không deploy và không push GitHub trong phiên nghiệm thu này.

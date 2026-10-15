@@ -1,0 +1,763 @@
+{
+  "status": "PASS",
+  "baseUrl": "http://127.0.0.1:4174",
+  "browser": {
+    "name": "Google Chrome",
+    "version": "155.0.8059.41",
+    "executablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "playwright": "1.64.1"
+  },
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 1000,
+      "routes": [
+        {
+          "label": "home",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#home",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "rooms",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#rooms",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "room/infinity-suite",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#room/infinity-suite",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "booking",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#booking",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "login",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#login",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "spa",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#spa",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "dining",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#dining",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "experiences",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#experiences",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "about",
+          "viewport": "desktop",
+          "url": "http://127.0.0.1:4174/#about",
+          "horizontalOverflow": false,
+          "scrollWidth": 1440,
+          "viewportWidth": 1440,
+          "covered": [],
+          "brokenImages": []
+        }
+      ]
+    },
+    "tablet": {
+      "width": 768,
+      "height": 1000,
+      "routes": [
+        {
+          "label": "home",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#home",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "rooms",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#rooms",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "room/infinity-suite",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#room/infinity-suite",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "booking",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#booking",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "login",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#login",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "spa",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#spa",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "dining",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#dining",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "experiences",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#experiences",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "about",
+          "viewport": "tablet",
+          "url": "http://127.0.0.1:4174/#about",
+          "horizontalOverflow": false,
+          "scrollWidth": 768,
+          "viewportWidth": 768,
+          "covered": [],
+          "brokenImages": []
+        }
+      ]
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "routes": [
+        {
+          "label": "home",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#home",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "rooms",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#rooms",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "room/infinity-suite",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#room/infinity-suite",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "booking",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#booking",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "login",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#login",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "spa",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#spa",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "dining",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#dining",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "experiences",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#experiences",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        },
+        {
+          "label": "about",
+          "viewport": "mobile",
+          "url": "http://127.0.0.1:4174/#about",
+          "horizontalOverflow": false,
+          "scrollWidth": 390,
+          "viewportWidth": 390,
+          "covered": [],
+          "brokenImages": []
+        }
+      ]
+    }
+  },
+  "workflows": {
+    "customer": {
+      "status": "PASS",
+      "email": "browser-qa-1792056790517@example.test",
+      "bookingReference": "ELY-2026-KLKZA8",
+      "profilePersisted": true,
+      "bookingPersisted": true,
+      "spaDiningExperienceSubmitted": true
+    },
+    "admin": {
+      "status": "PASS",
+      "dashboardMetrics": true,
+      "roomCatalogMinimum": true,
+      "serviceRequestsPersisted": true,
+      "cms": "PARTIAL — content/inquiries surface exists; no dedicated CMS editor route."
+    }
+  },
+  "diagnostics": [
+    {
+      "label": "home",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#home",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "rooms",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#rooms",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "room/infinity-suite",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#room/infinity-suite",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "booking",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#booking",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "login",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#login",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "spa",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#spa",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "dining",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#dining",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "experiences",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#experiences",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "about",
+      "viewport": "desktop",
+      "url": "http://127.0.0.1:4174/#about",
+      "horizontalOverflow": false,
+      "scrollWidth": 1440,
+      "viewportWidth": 1440,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "home",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#home",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "rooms",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#rooms",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "room/infinity-suite",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#room/infinity-suite",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "booking",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#booking",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "login",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#login",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "spa",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#spa",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "dining",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#dining",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "experiences",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#experiences",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "about",
+      "viewport": "tablet",
+      "url": "http://127.0.0.1:4174/#about",
+      "horizontalOverflow": false,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "home",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#home",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [
+        "Failed to load resource: net::ERR_NETWORK_ACCESS_DENIED"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "rooms",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#rooms",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "room/infinity-suite",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#room/infinity-suite",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "booking",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#booking",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "login",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#login",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "spa",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#spa",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "dining",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#dining",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "experiences",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#experiences",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    },
+    {
+      "label": "about",
+      "viewport": "mobile",
+      "url": "http://127.0.0.1:4174/#about",
+      "horizontalOverflow": false,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "covered": [],
+      "brokenImages": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "badResponses": []
+    }
+  ],
+  "warnings": [
+    {
+      "page": "home",
+      "externalFailedRequests": [
+        {
+          "url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap",
+          "failure": "net::ERR_NETWORK_ACCESS_DENIED"
+        }
+      ],
+      "brokenImages": []
+    },
+    {
+      "page": "home",
+      "externalFailedRequests": [
+        {
+          "url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap",
+          "failure": "net::ERR_NETWORK_ACCESS_DENIED"
+        }
+      ],
+      "brokenImages": []
+    },
+    {
+      "page": "home",
+      "externalFailedRequests": [
+        {
+          "url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap",
+          "failure": "net::ERR_NETWORK_ACCESS_DENIED"
+        }
+      ],
+      "brokenImages": []
+    }
+  ],
+  "blocked": []
+}

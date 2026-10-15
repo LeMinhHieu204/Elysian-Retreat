@@ -1,0 +1,11 @@
+{
+  "brand": "Elysian Retreat",
+  "purpose": "Image role manifest for the local visual implementation.",
+  "sources": [
+    { "role": "hero resort / pool", "provider": "Unsplash", "license_note": "Remote URL placeholder; verify and self-host approved asset before production" },
+    { "role": "rooms and suites", "provider": "Unsplash", "license_note": "Remote URL placeholder; verify and self-host approved asset before production" },
+    { "role": "spa and wellness", "provider": "Unsplash", "license_note": "Remote URL placeholder; verify and self-host approved asset before production" },
+    { "role": "fine dining", "provider": "Unsplash", "license_note": "Remote URL placeholder; verify and self-host approved asset before production" },
+    { "role": "experiences / yacht / landscape", "provider": "Unsplash", "license_note": "Remote URL placeholder; verify and self-host approved asset before production" }
+  ]
+}

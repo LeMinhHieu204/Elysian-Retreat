@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: elysian_retreat
+      POSTGRES_USER: elysian
+      POSTGRES_PASSWORD: local-development-only
+    ports:
+      - "5432:5432"
+    volumes:
+      - elysian-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elysian -d elysian_retreat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  elysian-postgres:
