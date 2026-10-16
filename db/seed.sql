@@ -33,6 +33,12 @@ INSERT INTO amenities (name) VALUES
 ('Sea View'),('Private Pool'),('Private Infinity Pool'),('Private Terrace'),('Butler Service'),('Spa Access'),('Complimentary Breakfast'),('Airport Transfer')
 ON CONFLICT (name) DO NOTHING;
 
+INSERT INTO content_pages (slug, title, body, status, published_at)
+VALUES
+  ('about', 'A house shaped by the sea', 'Elysian Retreat is a quiet coastal sanctuary shaped by light, water and thoughtful hospitality.', 'published', now()),
+  ('privacy', 'Privacy', 'We use the information you share to respond to your request and manage your stay.', 'draft', NULL)
+ON CONFLICT (slug) DO NOTHING;
+
 INSERT INTO room_type_amenities (room_type_id, amenity_id)
 SELECT rt.id, a.id FROM room_types rt CROSS JOIN amenities a
 WHERE (rt.slug = 'infinity-suite' AND a.name IN ('Sea View','Private Infinity Pool','Private Terrace','Complimentary Breakfast','Airport Transfer'))

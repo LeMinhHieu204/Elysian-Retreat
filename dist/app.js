@@ -364,6 +364,12 @@ function renderAdmin() {
   app.innerHTML = pageShell(content, 'about');
 }
 
+function renderAdminContent() {
+  const content = `<section class="editorial-page"><div class="editorial-intro"><p class="eyebrow">Content</p><h1>Content editor</h1><p>Draft, review and publish plain-text pages. Unpublished drafts never appear in the public API.</p></div><div class="booking-form-card" data-cms-view><p>Loading content…</p></div></section>`;
+  app.innerHTML = pageShell(content, 'about');
+  loadCmsEditor('[data-cms-view]');
+}
+
 function toast(message, success = true) {
   const node = document.createElement('div');
   node.className = `toast ${success ? 'success' : ''}`;
@@ -415,6 +421,19 @@ async function loadAdminView() {
   } catch (error) { target.innerHTML = `<p class="toast" style="display:block">${escapeHtml(error.message)}. Sign in with an admin account and try again.</p>`; }
 }
 
+async function loadCmsEditor(selector = '[data-admin-view]') {
+  const target = document.querySelector(selector);
+  if (!target) return;
+  try {
+    const pages = await apiJson('/api/admin/content/pages');
+    target.innerHTML = `<details open><summary>Create draft page</summary><form class="admin-inline-form" data-form="cms-create"><input name="slug" placeholder="slug" pattern="[a-z0-9-]+" required><input name="title" placeholder="Title" required><textarea name="body" placeholder="Plain-text content" required></textarea><button class="btn btn-outline">Save draft</button></form></details><div class="admin-management"><h2>Pages</h2>${pages.map(page => `<details><summary>${escapeHtml(page.title)} · ${escapeHtml(page.status)}</summary><form class="admin-inline-form" data-cms-edit="${escapeHtml(page.slug)}"><input name="title" value="${escapeHtml(page.title)}" required><textarea name="body" required>${escapeHtml(page.body)}</textarea><button class="btn btn-outline">Save changes</button><button class="btn btn-outline" type="button" data-cms-publish="${escapeHtml(page.slug)}" data-cms-next="${page.status === 'published' ? 'draft' : 'published'}">${page.status === 'published' ? 'Unpublish' : 'Publish'}</button></form></details>`).join('') || '<p>No pages yet.</p>'}</div>`;
+    const csrf = async () => (await apiJson('/api/auth/me')).csrfToken || '';
+    document.querySelector('[data-form="cms-create"]')?.addEventListener('submit', async event => { event.preventDefault(); try { const form = Object.fromEntries(new FormData(event.currentTarget)); await apiJson('/api/admin/content/pages', { method: 'POST', headers: { 'x-csrf-token': await csrf() }, body: JSON.stringify(form) }); toast('Draft created.'); loadCmsEditor(selector); } catch (error) { toast(error.message, false); } });
+    document.querySelectorAll('[data-cms-edit]').forEach(form => form.addEventListener('submit', async event => { event.preventDefault(); try { const slug = form.dataset.cmsEdit; const data = Object.fromEntries(new FormData(form)); await apiJson(`/api/admin/content/pages/${encodeURIComponent(slug)}`, { method: 'PATCH', headers: { 'x-csrf-token': await csrf() }, body: JSON.stringify(data) }); toast('Draft saved.'); loadCmsEditor(selector); } catch (error) { toast(error.message, false); } }));
+    document.querySelectorAll('[data-cms-publish]').forEach(button => button.addEventListener('click', async () => { try { const slug = button.dataset.cmsPublish; const next = button.dataset.cmsNext; await apiJson(`/api/admin/content/pages/${encodeURIComponent(slug)}/${next === 'published' ? 'publish' : 'unpublish'}`, { method: 'POST', headers: { 'x-csrf-token': await csrf() } }); toast(next === 'published' ? 'Page published.' : 'Page unpublished.'); loadCmsEditor(selector); } catch (error) { toast(error.message, false); } }));
+  } catch (error) { target.innerHTML = `<p class="toast" style="display:block">${escapeHtml(error.message)}. Sign in with a content editor account.</p>`; }
+}
+
 function adminManagementPanels(data) {
   const roomTypes = data.roomTypes || []; const customers = data.customers || []; const reports = data.reports || {}; const requests = [...(data.spaRequests || []).map(item => ({ ...item, requestType: 'Spa', label: item.service_name })), ...(data.diningRequests || []).map(item => ({ ...item, requestType: 'Dining', label: item.venue_name })), ...(data.experienceRequests || []).map(item => ({ ...item, requestType: 'Experience', label: item.experience_name }))];
   return `<div class="admin-management"><details open><summary>Room types & pricing</summary><form class="admin-inline-form" data-form="admin-room-type"><input name="slug" placeholder="slug" required /><input name="name" placeholder="Room name" required /><select name="category"><option>Room</option><option>Suite</option><option>Villa</option></select><input name="basePriceCents" type="number" min="0" placeholder="Price cents" required /><input name="maxAdults" type="number" min="1" value="2" required /><input name="areaM2" type="number" min="1" value="60" required /><input name="bedType" value="King Bed" required /><input name="shortDescription" placeholder="Short description" required /><input name="description" placeholder="Description" required /><button class="btn btn-outline" type="submit">Add room type</button></form><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Units</th><th>Active</th></tr></thead><tbody>${roomTypes.map(room => `<tr><td>${escapeHtml(room.name)}</td><td>${escapeHtml(room.category)}</td><td>€${(room.base_price_cents / 100).toLocaleString()}</td><td>${room.unit_count}</td><td>${room.is_active ? 'Yes' : 'Archived'}</td></tr>`).join('')}</tbody></table></div></details><details><summary>Customer directory (${customers.length})</summary><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Guest</th><th>Email</th><th>Bookings</th><th>Lifetime value</th></tr></thead><tbody>${customers.map(customer => `<tr><td>${escapeHtml(customer.display_name)}</td><td>${escapeHtml(customer.email)}</td><td>${customer.booking_count}</td><td>€${(customer.lifetime_value_cents / 100).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="4">No customer records.</td></tr>'}</tbody></table></div></details><details><summary>Service requests (${requests.length})</summary><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Type</th><th>Request</th><th>Guest</th><th>Date</th><th>Status</th></tr></thead><tbody>${requests.map(item => `<tr><td>${item.requestType}</td><td>${escapeHtml(item.label)}</td><td>${escapeHtml(item.guest_name)}</td><td>${formatDate(item.appointment_date || item.reservation_date || item.experience_date)}</td><td>${escapeHtml(item.status)}</td></tr>`).join('') || '<tr><td colspan="5">No service requests.</td></tr>'}</tbody></table></div></details><details><summary>Reports & payment mix</summary><div class="admin-report-grid">${(reports.monthly || []).slice(-6).map(item => `<div><small>${escapeHtml(item.month)}</small><strong>${item.reservations}</strong><span>€${(item.revenue_cents / 100).toLocaleString()}</span></div>`).join('') || '<p>No report data yet.</p>'}</div></details></div>`;
@@ -431,6 +450,7 @@ async function loadAdminViewEnhanced() {
     target.insertAdjacentHTML('beforeend', adminManagementPanels({ roomTypes, customers, reports, spaRequests, diningRequests, experienceRequests }));
     document.querySelectorAll('[data-admin-status]').forEach(button => button.addEventListener('click', async () => { try { const me = await apiJson('/api/auth/me'); await apiJson(`/api/admin/bookings/${button.dataset.reference}`, { method: 'PATCH', headers: { 'x-csrf-token': me.csrfToken || '' }, body: JSON.stringify({ status: button.dataset.adminStatus }) }); toast('Booking status updated.'); loadAdminViewEnhanced(); } catch (error) { toast(error.message, false); } }));
     document.querySelector('[data-form="admin-room-type"]')?.addEventListener('submit', async event => { event.preventDefault(); const form = Object.fromEntries(new FormData(event.currentTarget)); form.basePriceCents = Number(form.basePriceCents); form.maxAdults = Number(form.maxAdults); form.areaM2 = Number(form.areaM2); form.maxChildren = 0; try { const me = await apiJson('/api/auth/me'); await apiJson('/api/admin/room-types', { method: 'POST', headers: { 'x-csrf-token': me.csrfToken || '' }, body: JSON.stringify(form) }); toast('Room type created.'); loadAdminViewEnhanced(); } catch (error) { toast(error.message, false); } });
+    loadCmsEditor('[data-admin-view]');
   } catch (error) { target.innerHTML = `<p class="toast" style="display:block">${escapeHtml(error.message)}. Sign in with an admin account and try again.</p>`; }
 }
 
@@ -444,6 +464,7 @@ function render() {
   else if (current === 'login' || current === 'register') renderAuth(current);
   else if (current === 'account') renderAccount();
   else if (current === 'admin') renderAdmin();
+  else if (current === 'admin-content') renderAdminContent();
   else if (['dining', 'spa', 'experiences', 'about'].includes(current)) renderEditorial(current);
   else if (current === 'contact') renderContact();
   else if (['faq', 'privacy', 'terms'].includes(current)) renderLegal(current);
@@ -518,7 +539,7 @@ function bindEvents() {
   document.querySelector('[data-form="auth"]')?.addEventListener('submit', async event => {
     event.preventDefault();
     const form = event.currentTarget; const data = Object.fromEntries(new FormData(form));
-    try { const result = await apiJson(`/api/auth/${form.dataset.mode}`, { method: 'POST', body: JSON.stringify(data) }); toast(form.dataset.mode === 'login' ? 'Welcome back.' : 'Your account has been created.'); navigate(result.user.role === 'customer' ? 'account' : 'admin'); } catch (error) { toast(error.message + '. Start the backend if it is not running.', false); }
+    try { const result = await apiJson(`/api/auth/${form.dataset.mode}`, { method: 'POST', body: JSON.stringify(data) }); toast(form.dataset.mode === 'login' ? 'Welcome back.' : 'Your account has been created.'); navigate(result.user.role === 'customer' ? 'account' : (result.user.role === 'content_editor' ? 'admin-content' : 'admin')); } catch (error) { toast(error.message + '. Start the backend if it is not running.', false); }
   });
   if (route() === 'account') loadAccountView();
   if (route() === 'admin') loadAdminViewEnhanced();

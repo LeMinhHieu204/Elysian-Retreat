@@ -131,7 +131,7 @@ The admin surface is designed around operational clarity rather than a separate 
 - Spa, dining and experience request queues with status endpoints.
 - Audit log entries for important operational mutations.
 
-The **CMS editor UI is currently partial**. Public content and an inquiries surface exist, but there is no dedicated browser-based content editor route yet.
+The CMS editor is implemented as a role-aware browser route backed by PostgreSQL. Editors can create and edit plain-text drafts, publish or unpublish pages, and each mutation is audit logged. PostgreSQL/browser integration remains an environment verification gate for this phase.
 
 ## Technology Stack
 
@@ -311,7 +311,7 @@ The guest storefront, eight-room catalog, availability and quote paths, transact
 
 ### Partial
 
-- CMS editor UI: public content and inquiries surface exist; a dedicated editor route is not implemented.
+- CMS editor: source/API/UI and authorization regression are implemented; disposable PostgreSQL and browser verification remain outstanding.
 
 ### Requires external configuration
 
@@ -324,7 +324,7 @@ No production deployment or GitHub push is implied by this repository. The local
 
 ## Roadmap
 
-- Add a dedicated CMS editor with role-aware content workflows.
+- Verify the CMS editor against disposable PostgreSQL and the browser role matrix.
 - Connect email delivery and account verification flows.
 - Complete Stripe production checkout and refund orchestration.
 - Add deployment, monitoring and operational alerting.

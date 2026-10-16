@@ -5,8 +5,11 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import { pool, query, withTransaction } from './lib/db.js';
 import { DomainError, assertDateRange, assertOccupancy, calculateQuote, bookingReference, activeBookingStatuses, assertTransition } from './lib/domain.js';
+import { adminRoles, dashboardReadRoles, requireRole } from './lib/authorization.js';
 import { hashPassword, verifyPassword, createSession, getSession, sessionCookie, csrfCookie, clearSessionCookie, requireCsrf, parseCookies, hashToken, randomToken } from './lib/security.js';
 import { verifyStripeSignature, providerStatus } from './lib/payments.js';
+import { reconcileStripeEvent } from './lib/payment-reconciliation.js';
+import { assertCmsEditor, normalizePageInput } from './lib/cms.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -150,12 +153,8 @@ async function requireSession(request) {
 
 async function requireAdmin(request) {
   const session = await requireSession(request);
-  if (!['super_admin','hotel_manager','front_desk','reservations_staff','housekeeping','content_editor'].includes(session.role)) throw new DomainError('FORBIDDEN', 'Admin access is required.', 403);
+  requireRole(session, adminRoles);
   return session;
-}
-
-function requireRole(session, roles) {
-  if (!roles.includes(session.role)) throw new DomainError('FORBIDDEN', 'Your staff role cannot perform this operation.', 403);
 }
 
 async function authRegister(body, response) {
@@ -274,14 +273,22 @@ async function handleApi(request, response, pathname, method) {
     if (!process.env.STRIPE_WEBHOOK_SECRET) throw new DomainError('PAYMENT_PROVIDER_NOT_CONFIGURED', 'Stripe webhooks are not configured in this environment.', 503);
     const rawBody = await readRaw(request); const signature = request.headers['stripe-signature'];
     if (!verifyStripeSignature(rawBody, signature, process.env.STRIPE_WEBHOOK_SECRET)) throw new DomainError('PAYMENT_WEBHOOK_INVALID', 'Stripe webhook signature could not be verified.', 400);
-    const event = JSON.parse(rawBody); const inserted = await query('INSERT INTO payment_events (provider_event_id,event_type,payload) VALUES ($1,$2,$3) ON CONFLICT (provider_event_id) DO NOTHING RETURNING id', [event.id, event.type, event]);
-    if (inserted.rowCount && event.type === 'checkout.session.completed' && event.data?.object?.metadata?.bookingReference) {
-      await query("UPDATE bookings SET status='confirmed', payment_status='paid', updated_at=now() WHERE reference=$1", [event.data.object.metadata.bookingReference]);
-    }
-    ok(response, { received: true, duplicate: !inserted.rowCount }); return;
+    const event = JSON.parse(rawBody);
+    const reconciliation = await reconcileStripeEvent(event, withTransaction);
+    ok(response, { received: true, ...reconciliation }); return;
   }
   if (method === 'POST' && pathname === '/api/contact') { const body = await readJson(request); const result = await query('INSERT INTO contact_inquiries (name,email,topic,message) VALUES ($1,$2,$3,$4) RETURNING id,status', [requiredString(body.name, 'Name', 120), email(body.email), requiredString(body.topic, 'Topic', 120), requiredString(body.message, 'Message', 5000)]); ok(response, result.rows[0], 201); return; }
   if (method === 'POST' && pathname === '/api/newsletter') { const body = await readJson(request); const result = await query('INSERT INTO newsletter_subscriptions (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET unsubscribed_at=NULL RETURNING id,email', [email(body.email)]); ok(response, result.rows[0], 201); return; }
+  if (method === 'GET' && pathname === '/api/content/pages') {
+    const rows = await query("SELECT slug,title,body,published_at,updated_at FROM content_pages WHERE status='published' ORDER BY slug");
+    ok(response, rows.rows); return;
+  }
+  if (method === 'GET' && pathname.startsWith('/api/content/pages/')) {
+    const slug = decodeURIComponent(pathname.slice('/api/content/pages/'.length));
+    const rows = await query("SELECT slug,title,body,published_at,updated_at FROM content_pages WHERE slug=$1 AND status='published'", [slug]);
+    if (!rows.rowCount) throw new DomainError('CONTENT_NOT_FOUND', 'Published content was not found.', 404);
+    ok(response, rows.rows[0]); return;
+  }
   if (method === 'GET' && pathname === '/api/spa/services') { const result = await query('SELECT * FROM spa_services WHERE is_active=true ORDER BY name'); ok(response, result.rows); return; }
   if (method === 'GET' && pathname === '/api/dining/venues') { const result = await query('SELECT * FROM dining_venues WHERE is_active=true ORDER BY name'); ok(response, result.rows); return; }
   if (method === 'GET' && pathname === '/api/experiences') { const result = await query('SELECT * FROM experiences WHERE is_active=true ORDER BY name'); ok(response, result.rows); return; }
@@ -314,6 +321,44 @@ async function handleApi(request, response, pathname, method) {
   }
   if (pathname.startsWith('/api/admin/')) {
     const session = await requireAdmin(request);
+    if (method === 'GET' && pathname === '/api/admin/content/pages') {
+      assertCmsEditor(session);
+      const rows = await query('SELECT slug,title,body,status,published_at,updated_at FROM content_pages ORDER BY updated_at DESC');
+      ok(response, rows.rows); return;
+    }
+    if (method === 'POST' && pathname === '/api/admin/content/pages') {
+      assertCmsEditor(session);
+      if (!requireCsrf(request, session)) throw new DomainError('CSRF_FAILED', 'A valid CSRF token is required.', 403);
+      const input = normalizePageInput(await readJson(request));
+      const result = await query("INSERT INTO content_pages (slug,title,body,status,created_by,updated_by) VALUES ($1,$2,$3,'draft',$4,$4) RETURNING slug,title,body,status,published_at,updated_at", [input.slug, input.title, input.body, session.user_id]);
+      await query('INSERT INTO audit_logs (actor_user_id,action,entity_type,entity_id,metadata) VALUES ($1,$2,$3,$4,$5)', [session.user_id, 'content_page.create', 'content_page', input.slug, JSON.stringify({ title: input.title, status: 'draft' })]);
+      ok(response, result.rows[0], 201); return;
+    }
+    if (pathname.startsWith('/api/admin/content/pages/')) {
+      assertCmsEditor(session);
+      const suffix = pathname.slice('/api/admin/content/pages/'.length);
+      const isPublish = suffix.endsWith('/publish');
+      const isUnpublish = suffix.endsWith('/unpublish');
+      const slug = decodeURIComponent((isPublish || isUnpublish) ? suffix.slice(0, suffix.lastIndexOf('/')) : suffix);
+      if (isPublish || isUnpublish) {
+        if (method !== 'POST' || !requireCsrf(request, session)) throw new DomainError('CSRF_FAILED', 'A valid CSRF token is required.', 403);
+        const status = isPublish ? 'published' : 'draft';
+        const result = await query("UPDATE content_pages SET status=$2,published_at=CASE WHEN $2='published' THEN now() ELSE NULL END,updated_by=$3,updated_at=now() WHERE slug=$1 RETURNING slug,title,body,status,published_at,updated_at", [slug, status, session.user_id]);
+        if (!result.rowCount) throw new DomainError('CONTENT_NOT_FOUND', 'Content page was not found.', 404);
+        await query('INSERT INTO audit_logs (actor_user_id,action,entity_type,entity_id,metadata) VALUES ($1,$2,$3,$4,$5)', [session.user_id, `content_page.${status}`, 'content_page', slug, JSON.stringify({ status })]);
+        ok(response, result.rows[0]); return;
+      }
+      if (method === 'PATCH') {
+        if (!requireCsrf(request, session)) throw new DomainError('CSRF_FAILED', 'A valid CSRF token is required.', 403);
+        const current = await query('SELECT slug,title,body FROM content_pages WHERE slug=$1', [slug]);
+        if (!current.rowCount) throw new DomainError('CONTENT_NOT_FOUND', 'Content page was not found.', 404);
+        const body = await readJson(request);
+        const input = normalizePageInput({ slug, title: body.title ?? current.rows[0].title, body: body.body ?? current.rows[0].body });
+        const result = await query('UPDATE content_pages SET title=$2,body=$3,updated_by=$4,updated_at=now() WHERE slug=$1 RETURNING slug,title,body,status,published_at,updated_at', [slug, input.title, input.body, session.user_id]);
+        await query('INSERT INTO audit_logs (actor_user_id,action,entity_type,entity_id,metadata) VALUES ($1,$2,$3,$4,$5)', [session.user_id, 'content_page.update', 'content_page', slug, JSON.stringify({ title: input.title })]);
+        ok(response, result.rows[0]); return;
+      }
+    }
     if (method === 'GET' && pathname === '/api/admin/room-types') {
       const rows = await query(`SELECT rt.slug,rt.category,rt.name,rt.short_description,rt.description,rt.base_price_cents,rt.max_adults,rt.max_children,rt.area_m2,rt.bed_type,rt.is_active,COUNT(ru.id)::int AS unit_count
         FROM room_types rt LEFT JOIN room_units ru ON ru.room_type_id=rt.id GROUP BY rt.id ORDER BY rt.name`); ok(response, rows.rows); return;
@@ -361,6 +406,7 @@ async function handleApi(request, response, pathname, method) {
     if (method === 'GET' && pathname === '/api/admin/dining-reservations') { requireRole(session, ['super_admin','hotel_manager','front_desk','reservations_staff']); const rows = await query(`SELECT r.*,v.name AS venue_name FROM dining_reservations r JOIN dining_venues v ON v.id=r.venue_id ORDER BY r.reservation_date,r.reservation_time LIMIT 250`); ok(response, rows.rows); return; }
     if (method === 'GET' && pathname === '/api/admin/experience-bookings') { requireRole(session, ['super_admin','hotel_manager','front_desk','reservations_staff']); const rows = await query(`SELECT b.*,e.name AS experience_name FROM experience_bookings b JOIN experiences e ON e.id=b.experience_id ORDER BY b.experience_date LIMIT 250`); ok(response, rows.rows); return; }
     if (method === 'GET' && pathname === '/api/admin/dashboard') {
+      requireRole(session, dashboardReadRoles);
       const [bookings, checkins, checkouts, units, revenue, outstanding, pending, arrivals, departures, activity] = await Promise.all([
         query("SELECT COUNT(*)::int AS count FROM bookings WHERE status <> 'cancelled'"),
         query("SELECT COUNT(*)::int AS count FROM bookings WHERE check_in=CURRENT_DATE AND status IN ('confirmed','checked_in')"),
@@ -376,7 +422,7 @@ async function handleApi(request, response, pathname, method) {
       const inventory = units.rows[0]; const occupancyRate = inventory.total ? Math.round((inventory.occupied / inventory.total) * 1000) / 10 : 0;
       ok(response, { totalBookings: bookings.rows[0].count, todayCheckIns: checkins.rows[0].count, todayCheckOuts: checkouts.rows[0].count, availableRooms: inventory.available, occupiedRooms: inventory.occupied, maintenanceRooms: inventory.maintenance, outOfServiceRooms: inventory.out_of_service, totalRooms: inventory.total, occupancyRate, revenueCents: revenue.rows[0].cents, outstandingPaymentsCents: outstanding.rows[0].cents, pendingReservations: pending.rows[0].count, upcomingArrivals: arrivals.rows[0].count, upcomingDepartures: departures.rows[0].count, recentActivity: activity.rows }); return;
     }
-    if (method === 'GET' && pathname === '/api/admin/bookings') { const rows = await query(`SELECT b.reference,b.status,b.payment_status,b.check_in,b.check_out,b.total_cents,b.currency,b.guest_snapshot,rt.name AS room_name,ru.code AS room_unit FROM bookings b JOIN room_types rt ON rt.id=b.room_type_id LEFT JOIN room_units ru ON ru.id=b.room_unit_id ORDER BY b.created_at DESC LIMIT 100`); ok(response, rows.rows); return; }
+    if (method === 'GET' && pathname === '/api/admin/bookings') { requireRole(session, dashboardReadRoles); const rows = await query(`SELECT b.reference,b.status,b.payment_status,b.check_in,b.check_out,b.total_cents,b.currency,b.guest_snapshot,rt.name AS room_name,ru.code AS room_unit FROM bookings b JOIN room_types rt ON rt.id=b.room_type_id LEFT JOIN room_units ru ON ru.id=b.room_unit_id ORDER BY b.created_at DESC LIMIT 100`); ok(response, rows.rows); return; }
     if (method === 'PATCH' && pathname.startsWith('/api/admin/bookings/')) {
       if (!requireCsrf(request, session)) throw new DomainError('CSRF_FAILED', 'A valid CSRF token is required.', 403);
       requireRole(session, ['super_admin','hotel_manager','front_desk','reservations_staff']);
